@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "KaryaSutra API",
+    "_postman_id": "c64a6f6f-2f9d-4c1d-9c79-collection",
+    "description": "Endpoints for KaryaSutra portfolio",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@karyakosha.test\",\n  \"password\": \"Admin@123\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "Get Projects",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/projects" }
+    },
+    {
+      "name": "Create Project",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "formdata", "formdata": [] },
+        "url": "{{baseUrl}}/api/projects"
+      }
+    },
+    {
+      "name": "Get Clients",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/clients" }
+    },
+    {
+      "name": "Create Client",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": { "mode": "formdata", "formdata": [] },
+        "url": "{{baseUrl}}/api/clients"
+      }
+    },
+    {
+      "name": "Submit Contact",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"mobile\": \"9999999999\",\n  \"city\": \"Mumbai\"\n}"
+        },
+        "url": "{{baseUrl}}/api/contact"
+      }
+    },
+    {
+      "name": "List Contacts (admin)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/contact"
+      }
+    },
+    {
+      "name": "Subscribe Newsletter",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"subscriber@example.com\"\n}"
+        },
+        "url": "{{baseUrl}}/api/newsletter"
+      }
+    },
+    {
+      "name": "List Subscribers",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/newsletter"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" }
+  ]
+}
+
