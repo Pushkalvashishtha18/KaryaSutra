@@ -19,13 +19,3 @@ const start = async () => {
 };
 
 start();
-
-const path = require("path");
-
-// Serve frontend build
-app.use(express.static(path.join(__dirname, "../frontend/build")));
-
-// Serve React for all other routes
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
-});

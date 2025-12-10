@@ -4,51 +4,38 @@ import ProjectCard from "./ProjectCard.jsx";
 
 const ProjectSection = () => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    api
-      .get("/api/projects")
-      .then((res) => setProjects(res.data))
-      .catch((err) => {
-        console.error(err);
-        setProjects([
-          {
-            _id: "p1",
-            name: "Consultation",
-            description: "Simple guidance to prep listings.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=600&q=80",
-          },
-          {
-            _id: "p2",
-            name: "Design",
-            description: "Friendly design tweaks that sell.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=80",
-          },
-          {
-            _id: "p3",
-            name: "Marketing & Design",
-            description: "Clean visuals and clear messaging.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=80",
-          },
-          {
-            _id: "p4",
-            name: "Consultation & Marketing",
-            description: "Support for outreach and follow-ups.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=600&q=80",
-          },
-          {
-            _id: "p5",
-            name: "Consultation",
-            description: "Walkthroughs with staging tips.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=600&q=80",
-          },
-        ]);
-      });
+    const loadProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching projects from API...");
+        const res = await api.get("/api/projects");
+        console.log("Projects loaded successfully:", res.data);
+        if (res.data && res.data.length > 0) {
+          setProjects(res.data);
+        } else {
+          console.warn("No projects found in response");
+          setProjects([]);
+        }
+      } catch (err) {
+        console.error("Error loading projects:", err);
+        console.error("Error details:", {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+          url: err.config?.url,
+        });
+        setError(err.message || "Failed to load projects");
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProjects();
   }, []);
 
   return (
@@ -60,11 +47,28 @@ const ProjectSection = () => {
             We know what buyers look for. Here are simple highlights from recent work.
           </p>
         </div>
-        <div className="grid" style={{ gap: "20px" }}>
-          {projects.map((p, index) => (
-            <ProjectCard key={p._id} project={p} delay={index * 0.1} />
-          ))}
-        </div>
+        {loading && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+            Loading projects...
+          </div>
+        )}
+        {error && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#ef4444" }}>
+            Error: {error}. Please make sure the backend server is running on port 5000.
+          </div>
+        )}
+        {!loading && !error && projects.length === 0 && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+            No projects found.
+          </div>
+        )}
+        {!loading && !error && projects.length > 0 && (
+          <div className="grid" style={{ gap: "20px" }}>
+            {projects.map((p, index) => (
+              <ProjectCard key={p._id} project={p} delay={index * 0.1} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

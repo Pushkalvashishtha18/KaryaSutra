@@ -6,6 +6,34 @@ export const api = axios.create({
   baseURL: API_BASE,
 });
 
+// Add interceptors for public API to help debug
+api.interceptors.request.use(
+  (config) => {
+    console.log("Public API Request:", config.method?.toUpperCase(), config.url, "Base URL:", API_BASE);
+    return config;
+  },
+  (error) => {
+    console.error("Public API Request Error:", error);
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => {
+    console.log("Public API Response:", response.status, response.config.url, "Data length:", response.data?.length);
+    return response;
+  },
+  (error) => {
+    console.error("Public API Response Error:", {
+      status: error.response?.status,
+      url: error.config?.url,
+      message: error.message,
+      data: error.response?.data,
+    });
+    return Promise.reject(error);
+  }
+);
+
 export const authApi = (token) => {
   if (!token) {
     console.error("authApi called without token");

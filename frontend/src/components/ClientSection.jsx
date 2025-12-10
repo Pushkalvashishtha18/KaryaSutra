@@ -4,56 +4,38 @@ import ClientCard from "./ClientCard.jsx";
 
 const ClientSection = () => {
   const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    api
-      .get("/api/clients")
-      .then((res) => setClients(res.data))
-      .catch((err) => {
-        console.error(err);
-        setClients([
-          {
-            _id: "c1",
-            name: "Rayhan Smith",
-            designation: "Buyer | Toronto",
-            description: "Loved how simple and effective the process was.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
-          },
-          {
-            _id: "c2",
-            name: "Shilpa Kayak",
-            designation: "Seller | Austin",
-            description: "Clear communication and steady follow-through.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
-          },
-          {
-            _id: "c3",
-            name: "John Lagoss",
-            designation: "DPC Homes | Seattle",
-            description: "Design ideas were practical and easy to apply.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
-          },
-          {
-            _id: "c4",
-            name: "Manny Freeman",
-            designation: "Staging Designer | NYC",
-            description: "Smooth collaboration, thoughtful updates.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
-          },
-          {
-            _id: "c5",
-            name: "Lucy",
-            designation: "Buyer | Denver",
-            description: "Felt supported and informed at every step.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
-          },
-        ]);
-      });
+    const loadClients = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching clients from API...");
+        const res = await api.get("/api/clients");
+        console.log("Clients loaded successfully:", res.data);
+        if (res.data && res.data.length > 0) {
+          setClients(res.data);
+        } else {
+          console.warn("No clients found in response");
+          setClients([]);
+        }
+      } catch (err) {
+        console.error("Error loading clients:", err);
+        console.error("Error details:", {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+          url: err.config?.url,
+        });
+        setError(err.message || "Failed to load clients");
+        setClients([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadClients();
   }, []);
 
   return (
@@ -63,11 +45,28 @@ const ClientSection = () => {
           <h2>Happy Clients</h2>
           <p className="muted">Honest words from people we’ve helped.</p>
         </div>
-        <div className="grid" style={{ gap: "18px" }}>
-          {clients.map((c, index) => (
-            <ClientCard key={c._id} client={c} delay={index * 0.1} />
-          ))}
-        </div>
+        {loading && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+            Loading clients...
+          </div>
+        )}
+        {error && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#ef4444" }}>
+            Error: {error}. Please make sure the backend server is running on port 5000.
+          </div>
+        )}
+        {!loading && !error && clients.length === 0 && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+            No clients found.
+          </div>
+        )}
+        {!loading && !error && clients.length > 0 && (
+          <div className="grid" style={{ gap: "18px" }}>
+            {clients.map((c, index) => (
+              <ClientCard key={c._id} client={c} delay={index * 0.1} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
